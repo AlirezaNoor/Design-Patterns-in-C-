@@ -80,3 +80,23 @@ public sealed class Logger
 }
 
 ```
+## استفاده از Singleton در برنامه
+``` csharp
+class Program
+{
+    static void Main(string[] args)
+    {
+        // دریافت نمونه Singleton
+        Logger logger = Logger.GetInstance();
+
+        // نوشتن لاگ
+        logger.Log("Application started.");
+        logger.Log("Performing some operations...");
+        logger.Log("Application ended.");
+
+        // بررسی اینکه فقط یک نمونه وجود دارد
+        Logger anotherLogger = Logger.GetInstance();
+        Console.WriteLine($"Are both instances the same? {logger == anotherLogger}"); // true
+    }
+}
+```
