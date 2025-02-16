@@ -40,4 +40,136 @@ Design Pattern‌ها راه‌حل‌های اثبات‌شده‌ای برای
 - **Visitor**: عملیات جدیدی را روی اشیا بدون تغییر در ساختار آنها اضافه می‌کند.
 
 این الگوها به توسعه‌دهندگان C# کمک می‌کنند تا کدهای با کیفیت‌تر و قابل‌نگهداری‌تری بنویسند. هر الگو برای حل یک مشکل خاص طراحی شده است و انتخاب الگوی مناسب بستگی به نیازهای پروژه دارد.
+Singleton:
+
+
+
+Singleton یک الگوی طراحی است که تضمین می‌کند تنها یک نمونه (instance) از یک کلاس وجود داشته باشد و به آن دسترسی جهانی (global access) وجود داشته باشد. این الگو معمولاً در مواردی استفاده می‌شود که شما فقط به یک نمونه از کلاس نیاز دارید، مانند مدیریت اتصال به دیتابیس یا لاگینگ (logging).
+
+
+
+مثال واقعی: Logger (سیستم ثبت رویدادها)
+
+
+
+public sealed class Logger
+
+{
+
+   // تنها نمونه از کلاس Logger
+
+   private static readonly Logger _instance = new Logger();
+
+
+
+
+
+   // مسیر فایل لاگ
+
+   private readonly string _logFilePath = "log.txt";
+
+
+
+
+
+   // سازنده خصوصی برای جلوگیری از ایجاد نمونه‌های جدید
+
+   private Logger()
+
+   {
+
+       // ایجاد فایل لاگ اگر وجود نداشته باشد
+
+       if (!File.Exists(_logFilePath))
+
+       {
+
+           File.Create(_logFilePath).Close();
+
+       }
+
+   }
+
+
+
+
+
+   // متد برای دسترسی به نمونه Singleton
+
+   public static Logger GetInstance()
+
+   {
+
+       return _instance;
+
+   }
+
+
+
+
+
+   // متد برای نوشتن لاگ
+
+   public void Log(string message)
+
+   {
+
+       string logMessage = $"{DateTime.Now}: {message}";
+
+       File.AppendAllText(_logFilePath, logMessage + Environment.NewLine);
+
+   }
+
+}
+
+
+
+
+
+
+
+این ی مثال ساده حالا میایم و از این  مثال استفاده می کنیم
+
+
+
+
+
+class Program
+
+{
+
+   static void Main(string[] args)
+
+   {
+
+       // دریافت نمونه Singleton
+
+       Logger logger = Logger.GetInstance();
+
+
+
+
+
+       // نوشتن لاگ
+
+       logger.Log("Application started.");
+
+       logger.Log("Performing some operations...");
+
+       logger.Log("Application ended.");
+
+
+
+
+
+       // بررسی اینکه فقط یک نمونه وجود دارد
+
+       Logger anotherLogger = Logger.GetInstance();
+
+       Console.WriteLine($"Are both instances the same? {logger == anotherLogger}"); // true
+
+   }
+
+}
+
 
