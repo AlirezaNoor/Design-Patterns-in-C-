@@ -79,4 +79,4 @@ public sealed class Logger
     }
 }
 
-```csharp
+```
