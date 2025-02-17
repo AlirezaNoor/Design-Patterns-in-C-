@@ -100,3 +100,152 @@ class Program
     }
 }
 ```
+
+# Factory Method Pattern Example - Payment System
+
+این پروژه یک مثال عملی از الگوی طراحی **Factory Method** را نشان می‌دهد که در آن یک سیستم پرداخت با استفاده از این الگو پیاده‌سازی شده است.
+
+## الگوی Factory Method
+
+الگوی **Factory Method** یک الگوی طراحی ایجادی (Creational Pattern) است که به شما امکان می‌دهد اشیا را بدون مشخص کردن دقیق کلاس‌هایشان ایجاد کنید. این الگو با تعریف یک متد برای ایجاد اشیا، مسئولیت ایجاد شیء را به زیرکلاس‌ها واگذار می‌کند. این کار باعث می‌شود کد شما انعطاف‌پذیرتر و قابل توسعه‌تر شود.
+
+## ساختار پروژه
+
+در این پروژه، یک سیستم پرداخت ساده پیاده‌سازی شده است که از الگوی Factory Method برای ایجاد روش‌های پرداخت مختلف استفاده می‌کند.
+
+### کلاس‌ها و اینترفیس‌ها
+
+1. **اینترفیس `IPaymentMethod`**:
+   - این اینترفیس یک متد به نام `ProcessPayment` دارد که برای پردازش پرداخت استفاده می‌شود.
+
+   ```csharp
+   public interface IPaymentMethod
+   {
+       void ProcessPayment(double amount);
+   }
+   ```
+
+   کلاس‌های پیاده‌سازی IPaymentMethod:
+
+CreditCardPayment: برای پردازش پرداخت با کارت اعتباری.
+
+PayPalPayment: برای پردازش پرداخت با PayPal.
+
+BankTransferPayment: برای پردازش پرداخت با انتقال بانکی.
+
+``` csharp
+public class CreditCardPayment : IPaymentMethod
+{
+    public void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing credit card payment of ${amount}");
+    }
+}
+
+public class PayPalPayment : IPaymentMethod
+{
+    public void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing PayPal payment of ${amount}");
+    }
+}
+
+public class BankTransferPayment : IPaymentMethod
+{
+    public void ProcessPayment(double amount)
+    {
+        Console.WriteLine($"Processing bank transfer payment of ${amount}");
+    }
+}
+
+```
+
+## کلاس PaymentProcessor (Creator):
+
+این کلاس abstract یک Factory Method به نام CreatePaymentMethod تعریف می‌کند.
+
+همچنین یک متد ProcessOrder دارد که از Factory Method برای ایجاد شیء پرداخت و پردازش آن استفاده می‌کند.
+``` csharp
+public abstract class PaymentProcessor
+{
+    public abstract IPaymentMethod CreatePaymentMethod();
+
+    public void ProcessOrder(double amount)
+    {
+        IPaymentMethod paymentMethod = CreatePaymentMethod();
+        paymentMethod.ProcessPayment(amount);
+    }
+}
+```
+
+
+## کلاس‌های Concrete Creator:
+
+``` csharp
+CreditCardProcessor: برای ایجاد پرداخت با کارت اعتباری.
+
+PayPalProcessor: برای ایجاد پرداخت با PayPal.
+
+BankTransferProcessor: برای ایجاد پرداخت با انتقال بانکی.
+
+
+public class CreditCardProcessor : PaymentProcessor
+{
+    public override IPaymentMethod CreatePaymentMethod()
+    {
+        return new CreditCardPayment();
+    }
+}
+
+public class PayPalProcessor : PaymentProcessor
+{
+    public override IPaymentMethod CreatePaymentMethod()
+    {
+        return new PayPalPayment();
+    }
+}
+
+public class BankTransferProcessor : PaymentProcessor
+{
+    public override IPaymentMethod CreatePaymentMethod()
+    {
+        return new BankTransferPayment();
+    }
+}
+```
+
+## نحوه اجرای برنامه
+برنامه اصلی (Program.cs) از کلاس‌های Concrete Creator برای پردازش پرداخت‌های مختلف استفاده می‌کند.
+``` csharp
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        PaymentProcessor processor;
+
+        // پرداخت با کارت اعتباری
+        processor = new CreditCardProcessor();
+        processor.ProcessOrder(100.50);
+
+        // پرداخت با PayPal
+        processor = new PayPalProcessor();
+        processor.ProcessOrder(200.75);
+
+        // پرداخت با انتقال بانکی
+        processor = new BankTransferProcessor();
+        processor.ProcessOrder(300.25);
+    }
+}
+
+```
+
+## خروجی برنامه
+با اجرای برنامه، خروجی زیر نمایش داده می‌شود:
+
+ ``` csharp
+Processing credit card payment of $100.5
+Processing PayPal payment of $200.75
+Processing bank transfer payment of $300.25
+
+```
