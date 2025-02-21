@@ -249,3 +249,115 @@ Processing PayPal payment of $200.75
 Processing bank transfer payment of $300.25
 
 ```
+
+
+ # دیزاین پترن Builder
+دیزاین پترن Builder یکی از الگوهای ایجادی (Creational) است که برای ساخت اشیای پیچیده با استفاده از یک رویکرد گام‌به‌گام استفاده می‌شود. این الگو به ما کمک می‌کند که فرآیند ایجاد یک شیء را از نمایش نهایی آن جدا کنیم، به‌طوری که همان فرآیند ساخت بتواند نمایش‌های مختلفی از آن شیء را تولید کند.
+
+## ساختار الگوی Builder
+الگوی Builder از چهار بخش اصلی تشکیل شده است:
+
+- Builder (سازنده‌ی انتزاعی): اینترفیس یا کلاس انتزاعی که مراحل ساخت محصول را مشخص می‌کند.
+
+- ConcreteBuilder (سازنده‌ی مشخص): پیاده‌سازی کلاس Builder که مراحل ساخت محصول را پیاده‌سازی می‌کند.
+
+- Product (محصول نهایی): کلاس شیء پیچیده‌ای که ساخته می‌شود.
+
+- Director (کارگردان): کلاس مسئول مدیریت ترتیب اجرای مراحل ساخت.
+
+## مثال عملی در سی‌شارپ
+کلاس Product (محصول نهایی)
+
+``` csharp
+public class Burger
+{
+    public string Bread { get; set; }
+    public string Meat { get; set; }
+    public bool HasCheese { get; set; }
+    public bool HasLettuce { get; set; }
+
+    public void ShowInfo()
+    {
+        Console.WriteLine($"Burger with {Bread} bread, {Meat} meat, " +
+                          $"{(HasCheese ? "with Cheese" : "without Cheese")}, " +
+                          $"{(HasLettuce ? "with Lettuce" : "without Lettuce")}");
+    }
+}
+```
+## اینترفیس Builder (سازنده‌ی همبرگر)
+``` csharp
+public interface IBurgerBuilder
+{
+    void SetBread(string bread);
+    void SetMeat(string meat);
+    void AddCheese();
+    void AddLettuce();
+    Burger GetBurger();
+}
+```
+
+## پیاده‌سازی Concrete Builder (سازنده‌ی مشخص)
+
+``` csharp
+public class BurgerBuilder : IBurgerBuilder
+{
+    private Burger _burger = new Burger();
+
+    public void SetBread(string bread)
+    {
+        _burger.Bread = bread;
+    }
+
+    public void SetMeat(string meat)
+    {
+        _burger.Meat = meat;
+    }
+
+    public void AddCheese()
+    {
+        _burger.HasCheese = true;
+    }
+
+    public void AddLettuce()
+    {
+        _burger.HasLettuce = true;
+    }
+
+    public Burger GetBurger()
+    {
+        return _burger;
+    }
+}
+
+```
+
+## کلاس Director (مدیریت ساخت)
+``` csharp
+public class BurgerDirector
+{
+    private IBurgerBuilder _builder;
+
+    public BurgerDirector(IBurgerBuilder builder)
+    {
+        _builder = builder;
+    }
+
+    public void MakeClassicBurger()
+    {
+        _builder.SetBread("Sesame");
+        _builder.SetMeat("Beef");
+        _builder.AddCheese();
+        _builder.AddLettuce();
+    }
+
+    public void MakeVeganBurger()
+    {
+        _builder.SetBread("Whole Grain");
+        _builder.SetMeat("Plant-based");
+        _builder.AddLettuce();
+    }
+}
+
+```
+
+
