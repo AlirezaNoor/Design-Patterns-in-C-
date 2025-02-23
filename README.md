@@ -360,4 +360,84 @@ public class BurgerDirector
 
 ```
 
+# دیزاین پترن Prototype Design Pattern در سی شارپ
+
+
+  یکی از الگوهای طراحی ایجادی (Creational) است که به جای ایجاد اشیا از ابتدا، از کپی کردن یک نمونه موجود استفاده می‌کند. این الگو زمانی مفید است که ساخت یک شیء هزینه‌بر یا پیچیده باشد و کپی کردن آن ارزان‌تر تمام شود.
+  ## توضیح
+  ### مراحل پیاده‌سازی
+
+
+تعریف یک اینترفیس یا کلاس پایه که دارای متد Clone() باشد.
+
+پیاده‌سازی کلاس‌های ConcretePrototype که متد Clone() را اجرا کنند و یک کپی از شیء خود برگردانند.
+
+استفاده از الگو برای ایجاد نمونه‌های جدید از طریق کلون کردن.
+
+### مثال در سی شارپ
+
+
+
+
+``` csharp
+using System;
+
+namespace PrototypePattern
+{
+    // 1. اینترفیس یا کلاس پایه برای کلون کردن اشیا
+    public abstract class Prototype
+    {
+        public abstract Prototype Clone();
+    }
+
+    // 2. پیاده‌سازی کلاس ConcretePrototype
+    public class Employee : Prototype
+    {
+        public string Name { get; set; }
+        public string Position { get; set; }
+        public int Age { get; set; }
+
+        public Employee(string name, string position, int age)
+        {
+            Name = name;
+            Position = position;
+            Age = age;
+        }
+
+        // پیاده‌سازی متد Clone
+        public override Prototype Clone()
+        {
+            return (Prototype)this.MemberwiseClone(); // کپی سطحی (Shallow Copy)
+        }
+
+        public void ShowInfo()
+        {
+            Console.WriteLine($"Name: {Name}, Position: {Position}, Age: {Age}");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // ایجاد یک نمونه اولیه
+            Employee original = new Employee("Ali", "Developer", 30);
+            Console.WriteLine("Original Employee:");
+            original.ShowInfo();
+
+            // کلون کردن شیء اولیه
+            Employee cloned = (Employee)original.Clone();
+            cloned.Name = "Reza"; // تغییر مقدار در نسخه کلون شده
+            Console.WriteLine("\nCloned Employee (After Modification):");
+            cloned.ShowInfo();
+
+            // بررسی اینکه شیء اصلی تغییری نکرده است
+            Console.WriteLine("\nOriginal Employee After Clone:");
+            original.ShowInfo();
+        }
+    }
+}
+```
+
+
 
