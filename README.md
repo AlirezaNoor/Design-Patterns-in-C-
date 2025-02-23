@@ -439,5 +439,89 @@ namespace PrototypePattern
 }
 ```
 
+## الگوی طراحی Adapter در سی شارپ
+
+الگوی Adapter یکی از الگوهای ساختاری (Structural Design Patterns) است که به عنوان مبدل بین دو رابط ناسازگار عمل می‌کند. این الگو زمانی کاربرد دارد که بخواهیم یک کلاس با یک رابط ناسازگار کار کند، بدون اینکه تغییر مستقیمی در آن ایجاد کنیم.
+
+فرض کنید که یک کلاس داریم که اطلاعات را در فرمت JSON پردازش می‌کند، اما یک کلاس دیگر داریم که فقط با فرمت XML کار می‌کند. ما می‌خواهیم این دو کلاس بدون تغییر کد اصلی با هم تعامل داشته باشند. در اینجا، Adapter مشکل را حل می‌کند.
+
+۱. تعریف کلاس‌های موجود (بدون تغییر در آن‌ها)
+
+ ``` csharp
+
+using System;
+
+// کلاس ناسازگار که خروجی JSON تولید می‌کند
+class JsonService
+{
+    public string GetJsonData()
+    {
+        return "{ \"name\": \"Ali\", \"age\": 25 }";
+    }
+}
+
+// کلاس ناسازگاری که فقط با XML کار می‌کند
+class XmlProcessor
+{
+    public void ProcessXml(string xmlData)
+    {
+        Console.WriteLine("Processing XML Data: " + xmlData);
+    }
+}
+```
+۲. ایجاد Adapter برای تبدیل JSON به XML
+
+ ```csharp
+
+using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+// Adapter برای تبدیل JSON به XML
+class JsonToXmlAdapter : XmlProcessor
+{
+    private readonly JsonService _jsonService;
+
+    public JsonToXmlAdapter(JsonService jsonService)
+    {
+        _jsonService = jsonService;
+    }
+
+    public void ProcessJsonAsXml()
+    {
+        // دریافت داده‌های JSON
+        string jsonData = _jsonService.GetJsonData();
+        
+        // تبدیل JSON به XML
+        JObject jsonObject = JObject.Parse(jsonData);
+        XElement xmlData = new XElement("Person",
+            new XElement("Name", jsonObject["name"]),
+            new XElement("Age", jsonObject["age"])
+        );
+
+        // ارسال XML به کلاس ناسازگار
+        ProcessXml(xmlData.ToString());
+    }
+}
+
+````
+
+
+۳. استفاده از Adapter در برنامه
+```csharp
+class Program
+{
+    static void Main()
+    {
+        // نمونه‌ای از کلاس JSON که قصد داریم از آن در سیستم XML استفاده کنیم
+        JsonService jsonService = new JsonService();
+
+        // استفاده از Adapter برای تبدیل JSON به XML
+        JsonToXmlAdapter adapter = new JsonToXmlAdapter(jsonService);
+        adapter.ProcessJsonAsXml();  // پردازش XML از داده‌های JSON
+    }
+}
+````
+
 
 
