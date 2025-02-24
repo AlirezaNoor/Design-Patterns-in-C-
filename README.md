@@ -616,3 +616,102 @@ class Program
 }
 ```
 
+## الگوی Facade در سی‌شارپ
+
+الگوی Facade یک رابط ساده و یکپارچه برای یک سیستم پیچیده فراهم می‌کند. هدف این الگو کاهش پیچیدگی سیستم برای کاربر و ارائه یک نقطه ورود ساده است.
+
+## 🎯 سناریو: سیستم سینمای خانگی
+فرض کنید یک سیستم سینمای خانگی داریم که از چندین جزء مختلف تشکیل شده است:
+
+تلویزیون
+سیستم صوتی
+پخش‌کننده DVD
+برای روشن کردن سینما و تماشای فیلم، کاربر باید مراحل مختلفی را طی کند:
+
+تلویزیون را روشن کند.
+ورودی (Input) تلویزیون را روی HDMI تنظیم کند.
+سیستم صوتی را روشن کند.
+میزان صدا را تنظیم کند.
+پخش‌کننده DVD را روشن و فیلم را پخش کند.
+ما می‌توانیم همه این مراحل را در یک کلاس Facade قرار دهیم تا کاربر تنها با یک متد ساده، کل سیستم را مدیریت کند.
+
+### 🛠 پیاده‌سازی در سی‌شارپ
+1. تعریف کلاس‌های پیچیده سیستم
+``` csharp
+public class Television
+{
+    public void TurnOn() => Console.WriteLine("Television is ON.");
+    public void SetInput(string input) => Console.WriteLine($"Television input set to {input}.");
+}
+
+public class SoundSystem
+{
+    public void TurnOn() => Console.WriteLine("Sound System is ON.");
+    public void SetVolume(int level) => Console.WriteLine($"Sound volume set to {level}.");
+}
+
+public class DVDPlayer
+{
+    public void TurnOn() => Console.WriteLine("DVD Player is ON.");
+    public void PlayMovie(string movie) => Console.WriteLine($"Playing movie: {movie}.");
+}
+```
+
+2. ایجاد کلاس Facade برای ساده‌سازی کارها
+  
+``` csharp
+public class HomeTheaterFacade
+{
+    private readonly Television _tv;
+    private readonly SoundSystem _sound;
+    private readonly DVDPlayer _dvd;
+
+    public HomeTheaterFacade(Television tv, SoundSystem sound, DVDPlayer dvd)
+    {
+        _tv = tv;
+        _sound = sound;
+        _dvd = dvd;
+    }
+
+    public void WatchMovie(string movie)
+    {
+        Console.WriteLine("\nPreparing your home theater...");
+        _tv.TurnOn();
+        _tv.SetInput("HDMI");
+        _sound.TurnOn();
+        _sound.SetVolume(10);
+        _dvd.TurnOn();
+        _dvd.PlayMovie(movie);
+        Console.WriteLine("Enjoy your movie!\n");
+    }
+}
+
+```
+
+3. استفاده از Facade در برنامه
+ ``` csharp
+
+class Program
+{
+    static void Main()
+    {
+        // ایجاد اجزای مختلف سیستم
+        var tv = new Television();
+        var sound = new SoundSystem();
+        var dvd = new DVDPlayer();
+
+        // ایجاد Facade برای مدیریت ساده سیستم سینمای خانگی
+        var homeTheater = new HomeTheaterFacade(tv, sound, dvd);
+
+        // کاربر فقط این متد را صدا می‌زند و دیگر نیازی به دانستن جزئیات ندارد
+        homeTheater.WatchMovie("Inception");
+    }
+}
+ ```
+## 📌 مزایای استفاده از Facade
+✅ کاهش پیچیدگی سیستم – کاربر دیگر نیازی به دانستن نحوه تعامل با اجزای داخلی ندارد.
+✅ کپسوله‌سازی (Encapsulation) – جزئیات داخلی سیستم پنهان می‌مانند.
+✅ افزایش خوانایی و نگهداری کد – با تغییرات داخلی اجزای سیستم، تنها Facade را به‌روزرسانی می‌کنیم.
+✅ ایجاد نقطه ورود یکتا – این الگو می‌تواند یک API یکنواخت برای ما فراهم کند.
+
+
