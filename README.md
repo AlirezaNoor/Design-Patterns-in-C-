@@ -775,3 +775,108 @@ class Program
 ✅ مدیریت منابع (Lazy Initialization) – شیء واقعی فقط در صورت نیاز ساخته می‌شود.
 
 
+## الگوی Composite در سی‌شارپ
+الگوی Composite برای ساختارهای درختی استفاده می‌شود و به ما اجازه می‌دهد اشیا را به‌صورت سلسله‌مراتبی (Hierarchical) مدیریت کنیم. این الگو به ما امکان می‌دهد که اشیای منفرد و گروهی را به یک شکل مدیریت کنیم.
+
+## 🎯 سناریو: سیستم مدیریت فایل
+فرض کنید که می‌خواهیم یک سیستم مدیریت فایل طراحی کنیم.
+
+یک فایل به‌تنهایی می‌تواند وجود داشته باشد.
+یک فولدر می‌تواند شامل چندین فایل یا فولدر دیگر باشد.
+ما باید بتوانیم کل ساختار را به‌صورت یکپارچه مدیریت کنیم.
+با استفاده از Composite Pattern، می‌توانیم اشیای مختلف را در یک ساختار درختی قرار دهیم و بدون دانستن نوع آن‌ها (فایل یا فولدر)، با آن‌ها کار کنیم.
+
+## 🛠 پیاده‌سازی در سی‌شارپ
+1. تعریف اینترفیس مشترک برای فایل و فولدر
+
+
+
+
+ ``` csharp
+public interface IFileSystemComponent
+{
+    void Display(string indent = "");
+}
+
+```
+## 2. پیاده‌سازی کلاس فایل (Leaf)
+ 
+
+
+ ``` csharp
+public class File : IFileSystemComponent
+{
+    private readonly string _name;
+
+    public File(string name)
+    {
+        _name = name;
+    }
+
+    public void Display(string indent = "")
+    {
+        Console.WriteLine($"{indent}- File: {_name}");
+    }
+}
+
+
+```
+## 3. پیاده‌سازی کلاس فولدر (Composite)
+ 
+ ``` csharp
+public class Folder : IFileSystemComponent
+{
+    private readonly string _name;
+    private readonly List<IFileSystemComponent> _children = new();
+
+    public Folder(string name)
+    {
+        _name = name;
+    }
+
+    public void AddComponent(IFileSystemComponent component)
+    {
+        _children.Add(component);
+    }
+
+    public void Display(string indent = "")
+    {
+        Console.WriteLine($"{indent}+ Folder: {_name}");
+        foreach (var component in _children)
+        {
+            component.Display(indent + "   ");
+        }
+    }
+}
+
+
+```
+
+## 4. استفاده از Composite در برنامه 
+
+ ``` csharp
+class Program
+{
+    static void Main()
+    {
+        // ایجاد فایل‌های مستقل
+        var file1 = new File("Document.txt");
+        var file2 = new File("Photo.jpg");
+        var file3 = new File("Video.mp4");
+
+        // ایجاد یک فولدر و افزودن فایل‌ها به آن
+        var folder1 = new Folder("My Documents");
+        folder1.AddComponent(file1);
+        folder1.AddComponent(file2);
+
+        // ایجاد یک فولدر دیگر و افزودن فایل و فولدر قبلی به آن
+        var rootFolder = new Folder("Root");
+        rootFolder.AddComponent(folder1);
+        rootFolder.AddComponent(file3);
+
+        // نمایش کل ساختار
+        rootFolder.Display();
+    }
+}
+
+```
