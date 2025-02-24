@@ -522,6 +522,97 @@ class Program
     }
 }
 ````
+## الگوی Decorator در سی‌شارپ
+
+لگوی Decorator به شما اجازه می‌دهد که بدون تغییر کد اصلی یک کلاس، قابلیت‌های جدیدی به آن اضافه کنید. این کار از طریق کپسوله‌سازی رفتار اضافی در یک کلاس جدید انجام می‌شود.
+🎯 سناریو: قهوه فروشی
+فرض کنید که در یک کافی‌شاپ، انواع قهوه داریم و مشتریان می‌توانند افزودنی‌هایی مثل شیر یا شکلات به قهوه‌شان اضافه کنند. هر افزودنی، قیمت قهوه را تغییر می‌دهد. می‌خواهیم این قابلیت را بدون تغییر کلاس اصلی قهوه پیاده‌سازی کنیم.
+
+🛠 پیاده‌سازی در سی‌شارپ
+1. تعریف یک اینترفیس پایه برای قهوه
+
+``` csharp
+
+public interface ICoffee
+{
+    string GetDescription();
+    double GetCost();
+}
+```
+2. پیاده‌سازی کلاس پایه برای قهوه ساده
+``` csharp
+public class SimpleCoffee : ICoffee
+{
+    public string GetDescription() => "Simple Coffee";
+
+    public double GetCost() => 5.0;
+}
+```
 
 
+این کلاس، یک قهوه ساده را تعریف می‌کند که ۵ دلار قیمت دارد.
+
+3. ایجاد کلاس پایه برای دکوراتورها
+``` csharp
+public abstract class CoffeeDecorator : ICoffee
+{
+    protected ICoffee _coffee;
+
+    public CoffeeDecorator(ICoffee coffee)
+    {
+        _coffee = coffee;
+    }
+
+    public virtual string GetDescription() => _coffee.GetDescription();
+
+    public virtual double GetCost() => _coffee.GetCost();
+}
+```
+این کلاس یک دکوراتور کلی است که سایر افزودنی‌ها از آن ارث‌بری می‌کنند.
+
+4. پیاده‌سازی دکوراتورهای مختلف
+افزودن شیر به قهوه
+
+``` csharp
+
+
+public class MilkDecorator : CoffeeDecorator
+{
+    public MilkDecorator(ICoffee coffee) : base(coffee) { }
+
+    public override string GetDescription() => _coffee.GetDescription() + ", Milk";
+
+    public override double GetCost() => _coffee.GetCost() + 1.5;
+}
+
+```
+
+افزودن شکلات به قهوه
+``` csharp
+ public class ChocolateDecorator : CoffeeDecorator
+{
+    public ChocolateDecorator(ICoffee coffee) : base(coffee) { }
+
+    public override string GetDescription() => _coffee.GetDescription() + ", Chocolate";
+
+    public override double GetCost() => _coffee.GetCost() + 2.0;
+}
+````
+5. تست الگو در برنامه
+``` csharp
+class Program
+{
+    static void Main()
+    {
+        ICoffee coffee = new SimpleCoffee();
+        Console.WriteLine($"{coffee.GetDescription()} - ${coffee.GetCost()}");
+
+        coffee = new MilkDecorator(coffee);
+        Console.WriteLine($"{coffee.GetDescription()} - ${coffee.GetCost()}");
+
+        coffee = new ChocolateDecorator(coffee);
+        Console.WriteLine($"{coffee.GetDescription()} - ${coffee.GetCost()}");
+    }
+}
+```
 
