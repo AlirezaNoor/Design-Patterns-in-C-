@@ -949,3 +949,104 @@ class Program
 | **بازدهی حافظه**     | ✅ بالا       | ❌ پایین               |
 | **کنترل دستی روی تردها** | ❌ ندارد | ✅ دارد                 |
 
+## الگوی طراحی Chain of Responsibility
+
+الگوی طراحی Chain of Responsibility (زنجیره مسئولیت) یک الگوی رفتاری است که به شما امکان می‌دهد درخواست‌ها را از طریق یک زنجیره از handlers (مسئولین) ارسال کنید. هر handler تصمیم می‌گیرد که درخواست را پردازش کند یا آن را به handler بعدی در زنجیره ارسال کند.
+در این الگو، هر handler یک شیء است که مسئولیت پردازش درخواست را دارد. اگر یک handler نتواند درخواست را پردازش کند، آن را به handler بعدی در زنجیره ارسال می‌کند.
+
+### مثال ساده در سی‌شارپ
+فرض کنید می‌خواهیم یک سیستم پردازش درخواست‌ها ایجاد کنیم که در آن هر درخواست می‌تواند توسط یکی از handlerها پردازش شود. اگر handler فعلی نتواند درخواست را پردازش کند، آن را به handler بعدی ارسال می‌کند
+``` csharp
+
+using System;
+
+// تعریف یک کلاس پایه برای Handler
+abstract class Handler
+{
+    protected Handler _nextHandler;
+
+    public void SetNextHandler(Handler nextHandler)
+    {
+        _nextHandler = nextHandler;
+    }
+
+    public abstract void HandleRequest(int request);
+}
+
+// Handler اول
+class ConcreteHandler1 : Handler
+{
+    public override void HandleRequest(int request)
+    {
+        if (request >= 0 && request < 10)
+        {
+            Console.WriteLine($"ConcreteHandler1 handled the request {request}");
+        }
+        else if (_nextHandler != null)
+        {
+            _nextHandler.HandleRequest(request);
+        }
+    }
+}
+
+// Handler دوم
+class ConcreteHandler2 : Handler
+{
+    public override void HandleRequest(int request)
+    {
+        if (request >= 10 && request < 20)
+        {
+            Console.WriteLine($"ConcreteHandler2 handled the request {request}");
+        }
+        else if (_nextHandler != null)
+        {
+            _nextHandler.HandleRequest(request);
+        }
+    }
+}
+
+// Handler سوم
+class ConcreteHandler3 : Handler
+{
+    public override void HandleRequest(int request)
+    {
+        if (request >= 20 && request < 30)
+        {
+            Console.WriteLine($"ConcreteHandler3 handled the request {request}");
+        }
+        else if (_nextHandler != null)
+        {
+            _nextHandler.HandleRequest(request);
+        }
+    }
+}
+
+// کلاس اصلی برنامه
+class Program
+{
+    static void Main(string[] args)
+    {
+        // ایجاد زنجیره مسئولیت
+        Handler handler1 = new ConcreteHandler1();
+        Handler handler2 = new ConcreteHandler2();
+        Handler handler3 = new ConcreteHandler3();
+
+        handler1.SetNextHandler(handler2);
+        handler2.SetNextHandler(handler3);
+
+        // ارسال درخواست‌ها به زنجیره
+        int[] requests = { 5, 15, 25, 35 };
+
+        foreach (int request in requests)
+        {
+            handler1.HandleRequest(request);
+        }
+    }
+}
+```
+### توضیح کد: 
+Handler: یک کلاس انتزاعی است که متد HandleRequest را تعریف می‌کند و یک اشاره‌گر به handler بعدی (_nextHandler) دارد.
+ConcreteHandler1, ConcreteHandler2, ConcreteHandler3: این کلاس‌ها از کلاس Handler ارث‌بری می‌کنند و متد HandleRequest را پیاده‌سازی می‌کنند. هر handler بررسی می‌کند که آیا می‌تواند درخواست را پردازش کند یا خیر. اگر نتواند، درخواست را به handler بعدی ارسال می‌کند.
+Program: در این کلاس، زنجیره‌ای از handlerها ایجاد می‌شود و درخواست‌ها به زنجیره ارسال می‌شوند.
+
+
